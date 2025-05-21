@@ -4,11 +4,13 @@ namespace App\Controller;
 
 use App\Entity\Job;
 use App\Repository\JobRepository;
+use App\Service\Filter;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class JobController extends AbstractController
 {
@@ -45,9 +47,33 @@ class JobController extends AbstractController
     }
 
     #[Route('/api/jobs/filter', name: 'filter_jobs', methods: ['POST'])]
-    public function filterJobs(Request $request): Response
+    public function filterJobs(ValidatorInterface $validator, Request $request): Response
     {
-        $jobs = $this->jobRepository->filterJobs($request->toArray());
+        $reqFilters = $request->toArray();
+        $filters = [];
+        foreach ($reqFilters as $field => $value) {
+            $filter = null;
+
+            if (is_array($value)) {
+                $filter = new Filter($field, $value['value'], $value['operator']);
+            }
+            else {
+                $filter = new Filter($field, $value, '=');
+            }
+
+            $errors = $validator->validate($filter);
+            if (count($errors) > 0) {
+                return $this->json([
+                    'status' => 'error',
+                    'message' => 'filter error',
+                    'errors' => $errors
+                ], 400);
+            }
+
+            $filters[] = $filter;
+        }
+
+        $jobs = $this->jobRepository->filterJobs($filters);
 
         return $this->json([
             'status' => 'success',

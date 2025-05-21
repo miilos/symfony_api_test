@@ -5,7 +5,6 @@ namespace App\Entity;
 use App\Repository\JobRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation\Slug;
-use Gedmo\Mapping\Annotation\Timestampable;
 
 #[ORM\Entity(repositoryClass: JobRepository::class)]
 class Job

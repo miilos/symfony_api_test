@@ -38,13 +38,8 @@ class JobRepository extends ServiceEntityRepository
     {
         $query = $this->createQueryBuilder('j');
 
-        foreach ($filters as $field => $value) {
-            if (is_array($value)) {
-                $query->andWhere('j.' . $field . ' ' . $value['operator'] . ' :' . $field)->setParameter($field, $value['value']);
-            }
-            else {
-                $query->andWhere('j.' . $field . ' = :' . $field)->setParameter($field, $value);
-            }
+        foreach ($filters as $filter) {
+            $query->andWhere('j.' . $filter->getProperty() . ' ' . $filter->getOperator() . ' :' . $filter->getProperty())->setParameter($filter->getProperty(), $filter->getValue());
         }
 
         return $query->getQuery()->getResult();

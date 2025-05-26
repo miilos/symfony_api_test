@@ -5,6 +5,7 @@ namespace App\Entity;
 use App\Repository\JobRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation\Slug;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ORM\Entity(repositoryClass: JobRepository::class)]
 class Job
@@ -12,41 +13,86 @@ class Job
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups([
+        'job_details',
+        'employer_job_listings',
+    ])]
     private ?int $id = null;
 
     #[ORM\Column]
+    #[Groups([
+        'job_details',
+        'employer_job_listings',
+    ])]
     private ?string $name = null;
 
     #[ORM\Column]
+    #[Groups([
+        'job_details',
+        'employer_job_listings',
+    ])]
     private ?string $description = null;
 
     #[ORM\Column]
+    #[Groups([
+        'job_details',
+        'employer_job_listings',
+    ])]
     private ?string $location = null;
 
     #[ORM\Column]
+    #[Groups([
+        'job_details',
+        'employer_job_listings',
+    ])]
     private ?string $field = null;
 
     #[ORM\Column]
+    #[Groups([
+        'job_details',
+        'employer_job_listings',
+    ])]
     private ?int $startSalary = null;
 
     #[ORM\Column(enumType: ShiftsEnum::class)]
+    #[Groups([
+        'job_details',
+        'employer_job_listings',
+    ])]
     private ?ShiftsEnum $shifts = null;
 
     #[ORM\Column]
+    #[Groups([
+        'job_details',
+        'employer_job_listings',
+    ])]
     private ?bool $workFromHome = null;
 
     #[ORM\Column]
+    #[Groups([
+        'job_details',
+        'employer_job_listings',
+    ])]
     private ?bool $flexibleHours = null;
 
     #[ORM\Column]
+    #[Groups([
+        'job_details',
+        'employer_job_listings',
+    ])]
     private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\Column]
     #[Slug(fields: ['name'])]
+    #[Groups([
+        'job_details',
+        'employer_job_listings'
+    ])]
     private ?string $slug = null;
 
     #[ORM\ManyToOne(inversedBy: 'jobs')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['job_details'])]
     private ?Employer $employer = null;
 
     public function getId(): ?int

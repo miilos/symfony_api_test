@@ -16,16 +16,15 @@ class EmployerController extends AbstractController
     #[Route('/api/employers', name: 'get_all_employers', methods: ['GET'])]
     public function getAllEmployers(): Response
     {
-        $employers = $this->employerRepository->findAllEmployers();
+        $employers = $this->employerRepository->findAll();
 
         return $this->json([
             'status' => 'success',
+            'results' => count($employers),
             'data' => [
                 'employers' => $employers,
             ]
-        ],
-            context: ['skip_null_values' => true]
-        );
+        ], context: ['groups' => 'employer_details']);
     }
 
     #[Route('/api/employers/listings', name: 'get_employer_jobs', methods: ['GET'])]
@@ -38,8 +37,6 @@ class EmployerController extends AbstractController
             'data' => [
                 'employers' => $employers,
             ]
-        ],
-            context: ['skip_null_values' => true]
-        );
+        ], context: ['groups' => 'employer_job_listings']);
     }
 }

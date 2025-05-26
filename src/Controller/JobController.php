@@ -20,9 +20,9 @@ class JobController extends AbstractController
     ) {}
 
     #[Route('/api/jobs', name: 'get_all_jobs', methods: ['GET'])]
-    public function getAll(Request $request, SerializerInterface $serializer): Response
+    public function getAll(Request $request): Response
     {
-        $jobs = $this->jobRepository->findAllJobs();
+        $jobs = $this->jobRepository->findAll();
 
         return $this->json([
             'status' => 'success',
@@ -30,20 +30,21 @@ class JobController extends AbstractController
             'data' => [
                 'jobs' => $jobs
             ]
-        ]);
+        ], context: ['groups' => 'job_details']);
     }
 
     #[Route('/api/jobs/{slug}', name: 'get_job', methods: ['GET'])]
-    public function getOne(string $slug): Response
+    public function getOne(
+        #[MapEntity(mapping: ['slug' => 'slug'])]
+        Job $job
+    ): Response
     {
-        $job = $this->jobRepository->findJobBySlug($slug);
-
         return $this->json([
             'status' => 'success',
             'data' => [
                 'job' => $job
             ]
-        ]);
+        ], context: ['groups' => 'job_details']);
     }
 
     #[Route('/api/jobs/filter', name: 'filter_jobs', methods: ['POST'])]
@@ -81,7 +82,7 @@ class JobController extends AbstractController
             'data' => [
                 'jobs' => $jobs
             ]
-        ]);
+        ], context: ['groups' => 'job_details']);
     }
 
     #[Route('/api/jobs/field/{field}', name: 'get_jobs_by_field', methods: ['GET'])]
@@ -98,7 +99,7 @@ class JobController extends AbstractController
             'data' => [
                 'jobs' => $jobs
             ]
-        ]);
+        ], context: ['groups' => 'job_details']);
     }
 
     #[Route('/api/jobs', name: 'create_job', methods: ['POST'])]

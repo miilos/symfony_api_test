@@ -16,22 +16,48 @@ class Employer
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups([
+        'job_details',
+        'employer_details',
+        'employer_job_listings'
+    ])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups([
+        'job_details',
+        'employer_details',
+        'employer_job_listings'
+    ])]
     private ?string $name = null;
 
     #[ORM\Column(type: Types::TEXT)]
+    #[Groups([
+        'job_details',
+        'employer_details',
+        'employer_job_listings'
+    ])]
     private ?string $description = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups([
+        'job_details',
+        'employer_details',
+        'employer_job_listings'
+    ])]
     private ?string $basedIn = null;
 
     /**
      * @var Collection<int, Job>
      */
     #[ORM\OneToMany(targetEntity: Job::class, mappedBy: 'employer')]
+    #[Groups([
+        'employer_job_listings'
+    ])]
     private Collection $jobs;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $slug = null;
 
     public function __construct()
     {
@@ -105,6 +131,18 @@ class Employer
                 $job->setEmployer(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getSlug(): ?string
+    {
+        return $this->slug;
+    }
+
+    public function setSlug(?string $slug): static
+    {
+        $this->slug = $slug;
 
         return $this;
     }

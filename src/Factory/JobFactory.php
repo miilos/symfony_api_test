@@ -30,15 +30,6 @@ final class JobFactory extends PersistentProxyObjectFactory
       'Content writer'
     ];
 
-    private const EMPLOYERS = [
-        'Google',
-        'Microsoft',
-        'Mozilla',
-        'Laguna',
-        'Vulkan',
-        'Inspira'
-    ];
-
     private const LOCATIONS = [
       'Subotica',
       'Novi Sad',
@@ -81,13 +72,11 @@ final class JobFactory extends PersistentProxyObjectFactory
         return [
             'createdAt' => \DateTimeImmutable::createFromMutable(self::faker()->dateTimeBetween('-1 year')),
             'description' => self::faker()->text(),
-            'employer' => self::faker()->randomElement(self::EMPLOYERS),
             'field' => self::faker()->randomElement(self::FIELDS),
             'flexibleHours' => self::faker()->boolean(),
             'location' => self::faker()->randomElement(self::LOCATIONS),
             'name' => self::faker()->randomElement(self::JOB_NAMES),
             'shifts' => self::faker()->randomElement(ShiftsEnum::cases()),
-            //'slug' => self::faker()->text(),
             'startSalary' => self::faker()->numberBetween(10, 20) * 10000,
             'workFromHome' => self::faker()->boolean(),
         ];

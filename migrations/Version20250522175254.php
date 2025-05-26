@@ -10,7 +10,7 @@ use Doctrine\Migrations\AbstractMigration;
 /**
  * Auto-generated Migration: Please modify to your needs!
  */
-final class Version20250519172450 extends AbstractMigration
+final class Version20250522175254 extends AbstractMigration
 {
     public function getDescription(): string
     {
@@ -21,7 +21,7 @@ final class Version20250519172450 extends AbstractMigration
     {
         // this up() migration is auto-generated, please modify it to your needs
         $this->addSql(<<<'SQL'
-            CREATE TABLE job (id INT AUTO_INCREMENT NOT NULL, name VARCHAR(255) NOT NULL, description VARCHAR(255) NOT NULL, employer VARCHAR(255) NOT NULL, location VARCHAR(255) NOT NULL, field VARCHAR(255) NOT NULL, start_salary INT NOT NULL, shifts INT NOT NULL, work_from_home BOOLEAN NOT NULL, flexible_hours BOOLEAN NOT NULL, created_at TIMESTAMP NOT NULL, slug VARCHAR(255) NOT NULL, PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB
+            ALTER TABLE job DROP employer, CHANGE created_at created_at DATETIME NOT NULL COMMENT '(DC2Type:datetime_immutable)'
         SQL);
     }
 
@@ -29,10 +29,7 @@ final class Version20250519172450 extends AbstractMigration
     {
         // this down() migration is auto-generated, please modify it to your needs
         $this->addSql(<<<'SQL'
-            CREATE SCHEMA public
-        SQL);
-        $this->addSql(<<<'SQL'
-            DROP TABLE job
+            ALTER TABLE job ADD employer VARCHAR(255) NOT NULL, CHANGE created_at created_at DATETIME NOT NULL
         SQL);
     }
 }

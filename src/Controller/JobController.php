@@ -10,6 +10,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class JobController extends AbstractController
@@ -19,9 +20,9 @@ class JobController extends AbstractController
     ) {}
 
     #[Route('/api/jobs', name: 'get_all_jobs', methods: ['GET'])]
-    public function getAll(Request $request): Response
+    public function getAll(Request $request, SerializerInterface $serializer): Response
     {
-        $jobs = $this->jobRepository->findAll();
+        $jobs = $this->jobRepository->findAllJobs();
 
         return $this->json([
             'status' => 'success',
@@ -33,11 +34,10 @@ class JobController extends AbstractController
     }
 
     #[Route('/api/jobs/{slug}', name: 'get_job', methods: ['GET'])]
-    public function getOne(
-        #[MapEntity(mapping: ['slug' => 'slug'])]
-        Job $job,
-    ): Response
+    public function getOne(string $slug): Response
     {
+        $job = $this->jobRepository->findJobBySlug($slug);
+
         return $this->json([
             'status' => 'success',
             'data' => [
@@ -137,4 +137,17 @@ class JobController extends AbstractController
             'message' => 'job deleted!'
         ], 204);
     }
+
+//    private function getSerializeContext(): array
+//    {
+//        return [
+//          AbstractNormalizer::CIRCULAR_REFERENCE_HANDLER => function (object $object, ?string $format, array $context): string {
+//            if (!$object instanceof Job) {
+//                throw new CircularReferenceException('A circular reference has been detected when serializing the object of class "'.get_debug_type($object));
+//            }
+//
+//            return $object->getName();
+//          }
+//        ];
+//    }
 }

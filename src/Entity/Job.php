@@ -21,9 +21,6 @@ class Job
     private ?string $description = null;
 
     #[ORM\Column]
-    private ?string $employer = null;
-
-    #[ORM\Column]
     private ?string $location = null;
 
     #[ORM\Column]
@@ -47,6 +44,10 @@ class Job
     #[ORM\Column]
     #[Slug(fields: ['name'])]
     private ?string $slug = null;
+
+    #[ORM\ManyToOne(inversedBy: 'jobs')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Employer $employer = null;
 
     public function getId(): ?int
     {
@@ -76,19 +77,7 @@ class Job
 
         return $this;
     }
-
-    public function getEmployer(): ?string
-    {
-        return $this->employer;
-    }
-
-    public function setEmployer(string $employer): static
-    {
-        $this->employer = $employer;
-
-        return $this;
-    }
-
+    
     public function getLocation(): ?string
     {
         return $this->location;
@@ -181,6 +170,18 @@ class Job
     public function setSlug(string $slug): static
     {
         $this->slug = $slug;
+
+        return $this;
+    }
+
+    public function getEmployer(): ?Employer
+    {
+        return $this->employer;
+    }
+
+    public function setEmployer(?Employer $employer): static
+    {
+        $this->employer = $employer;
 
         return $this;
     }

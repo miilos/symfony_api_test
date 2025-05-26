@@ -2,7 +2,44 @@
 
 namespace App\Controller;
 
-class EmployerController
-{
+use App\Repository\EmployerRepository;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Routing\Attribute\Route;
 
+class EmployerController extends AbstractController
+{
+    public function __construct(
+        private EmployerRepository $employerRepository,
+    ) {}
+
+    #[Route('/api/employers', name: 'get_all_employers', methods: ['GET'])]
+    public function getAllEmployers(): Response
+    {
+        $employers = $this->employerRepository->findAllEmployers();
+
+        return $this->json([
+            'status' => 'success',
+            'data' => [
+                'employers' => $employers,
+            ]
+        ],
+            context: ['skip_null_values' => true]
+        );
+    }
+
+    #[Route('/api/employers/listings', name: 'get_employer_jobs', methods: ['GET'])]
+    public function getEmployerJobListings(): Response
+    {
+        $employers = $this->employerRepository->getEmployerJobListings();
+
+        return $this->json([
+            'status' => 'success',
+            'data' => [
+                'employers' => $employers,
+            ]
+        ],
+            context: ['skip_null_values' => true]
+        );
+    }
 }

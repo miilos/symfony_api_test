@@ -2,18 +2,19 @@
 
 namespace App\Repository;
 
+use App\DTOs\JobDTO;
 use App\Entity\Job;
 use App\Entity\ShiftsEnum;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
-use Pagerfanta\Doctrine\ORM\QueryAdapter;
+use Pagerfanta\Adapter\ArrayAdapter;
 use Pagerfanta\Pagerfanta;
 
 /**
  * @extends ServiceEntityRepository<Job>
  */
-class JobRepository extends ServiceEntityRepository
+class JobRepository extends ServiceEntityRepository implements RepositoryInterface
 {
     public function __construct(
         ManagerRegistry $registry,
@@ -23,26 +24,73 @@ class JobRepository extends ServiceEntityRepository
         parent::__construct($registry, Job::class);
     }
 
-    public function findByField(string $field)
+    public function toDTOArray(array $jobs): array
     {
-        $query = $this->createQueryBuilder('j')
-            ->where('j.field = :field')
-            ->setParameter('field', $field)
-            ->orderBy('j.name', 'ASC')
-            ->getQuery();
-
-        return new Pagerfanta(new QueryAdapter($query));
+        $dtos = [];
+        foreach ($jobs as $job) {
+            $dtos[] = new JobDTO($job, $job->getEmployer());
+        }
+        return $dtos;
     }
 
-    public function filterJobs(array $filters)
+    /**
+     * @return JobDTO[]
+     */
+    public function findAllJobs(): array
+    {
+        $jobs = $this->createQueryBuilder('j')
+            ->leftJoin('j.employer', 'e')
+            ->addSelect('e')
+            ->addOrderBy('j.createdAt', 'DESC')
+            ->getQuery()
+            ->getResult();
+
+        return $this->toDTOArray($jobs);
+    }
+
+    public function findJobBySlug(string $slug): ?JobDTO
+    {
+        $job = $this->createQueryBuilder('j')
+            ->leftJoin('j.employer', 'e')
+            ->addSelect('e')
+            ->where('j.slug = :slug')
+            ->setParameter('slug', $slug)
+            ->getQuery()
+            ->getOneOrNullResult();
+
+        return new JobDTO($job, $job->getEmployer());
+    }
+
+    public function findByField(string $field): Pagerfanta
+    {
+        $jobs = $this->createQueryBuilder('j')
+            ->leftJoin('j.employer', 'e')
+            ->addSelect('e')
+            ->where('j.field = :field')
+            ->setParameter('field', $field)
+            ->addOrderBy('j.createdAt', 'ASC')
+            ->getQuery()
+            ->getResult();
+
+        return new Pagerfanta(new ArrayAdapter($this->toDTOArray($jobs)));
+    }
+
+    /**
+     * @return JobDTO[]
+     */
+    public function filterJobs(array $filters): array
     {
         $query = $this->createQueryBuilder('j');
 
         foreach ($filters as $filter) {
-            $query->andWhere('j.' . $filter->getProperty() . ' ' . $filter->getOperator() . ' :' . $filter->getProperty())->setParameter($filter->getProperty(), $filter->getValue());
+            $query->andWhere('j.' . $filter->getProperty() . ' ' . $filter->getOperator() . ' :' . $filter->getProperty())
+                ->setParameter($filter->getProperty(), $filter->getValue());
         }
 
-        return $query->getQuery()->getResult();
+        $jobs = $query->getQuery()
+            ->getResult();
+
+        return $this->toDTOArray($jobs);
     }
 
     public function createJob(array $jobData): Job
